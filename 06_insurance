@@ -1,0 +1,10 @@
+-- EN: Cost and admission type analysis by insurance provider.
+-- PL: Analiza kosztów i typów przyjęć według ubezpieczyciela.
+
+SELECT "Insurance Provider", "Admission Type",
+COUNT (*),
+ROUND (AVG("Billing Amount"), 2) as kwota
+FROM healthcare_dataset hd
+GROUP BY "Insurance Provider", "Admission Type"
+ORDER BY kwota DESC;
+
