@@ -1,0 +1,22 @@
+-- EN: Analysis of length of stay by diagnosis and age group using JULIANDAY().
+-- PL: Analiza czasu hospitalizacji według diagnozy i grupy wiekowej z użyciem JULIANDAY().
+SELECT
+JULIANDAY("Discharge Date") - JULIANDAY("Date of Admission") as pobyt
+FROM healthcare_dataset hd; 
+
+SELECT "Medical Condition",
+AVG(JULIANDAY("Discharge Date") - JULIANDAY("Date of Admission")) as pobyt
+FROM healthcare_dataset hd
+GROUP BY "Medical Condition";
+
+SELECT "Medical Condition",
+ROUND (AVG(JULIANDAY("Discharge Date") - JULIANDAY("Date of Admission")), 1) as pobyt
+FROM healthcare_dataset hd
+GROUP BY "Medical Condition"
+ORDER BY "Medical Condition" DESC;
+
+SELECT "Medical Condition",
+ROUND (AVG(JULIANDAY("Discharge Date") - JULIANDAY("Date of Admission")), 1) as pobyt
+FROM healthcare_dataset hd
+GROUP BY "Medical Condition"
+ORDER BY pobyt DESC;
