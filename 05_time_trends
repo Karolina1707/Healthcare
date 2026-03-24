@@ -1,0 +1,39 @@
+-- EN: Monthly and yearly admission trends and billing amounts using STRFTIME().
+-- PL: Miesięczne i roczne trendy przyjęć i kosztów z użyciem STRFTIME().
+
+SELECT
+strftime('%Y', "Date of Admission") AS rok,
+COUNT(*) AS liczba_pacjentow
+FROM healthcare_dataset hd
+GROUP BY rok
+ORDER BY liczba_pacjentow;
+
+SELECT
+strftime('%Y-%m', "Date of Admission") AS miesiac,
+COUNT(*) AS liczba_pacjentow,
+ROUND (AVG("Billing Amount"), 2) as kwota
+FROM healthcare_dataset hd
+GROUP BY miesiac
+ORDER BY kwota DESC;
+
+SELECT "Medical Condition",
+strftime('%Y-%m', "Date of Admission") AS miesiac,
+COUNT(*) AS liczba_pacjentow,
+ROUND (AVG("Billing Amount"), 2) as kwota
+FROM healthcare_dataset hd
+GROUP BY miesiac, "Medical Condition"
+ORDER BY liczba_pacjentow DESC;
+
+SELECT "Medical Condition",
+strftime('%Y-%m', "Date of Admission") AS miesiac,
+COUNT(*) AS liczba_pacjentow,
+ROUND (AVG("Billing Amount"), 2) as kwota,
+CASE WHEN Age <= 18 THEN "0-18"
+    WHEN Age BETWEEN 19 AND 35 THEN "19-35"
+    WHEN Age BETWEEN 36 AND 50 THEN "36-50"
+    WHEN Age BETWEEN 51 AND 65 THEN "51-65"
+    WHEN Age > 65 THEN "65+"
+    END AS age_group
+FROM healthcare_dataset hd
+GROUP BY miesiac, "Medical Condition", age_group
+ORDER BY liczba_pacjentow DESC;
