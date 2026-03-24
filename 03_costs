@@ -1,0 +1,37 @@
+-- EN: Billing analysis by diagnosis, age group and admission type using RANK() window function.
+-- PL: Analiza kosztów według diagnozy, grupy wiekowej i trybu przyjęcia z użyciem RANK().
+
+SELECT "Medical Condition",
+COUNT(*) as liczba_osob,
+ROUND (AVG("Billing Amount"), 2) as kwota,
+CASE WHEN Age <= 18 THEN "0-18"
+    WHEN Age BETWEEN 19 AND 35 THEN "19-35"
+    WHEN Age BETWEEN 36 AND 50 THEN "36-50"
+    WHEN Age BETWEEN 51 AND 65 THEN "51-65"
+    WHEN Age > 65 THEN "65+"
+    END AS age_group
+FROM healthcare_dataset hd
+GROUP BY age_group, "Medical Condition"
+ORDER BY liczba_osob DESC; 
+
+SELECT "Medical Condition",
+RANK () OVER (ORDER BY ROUND (AVG("Billing Amount"), 2) DESC) as rank,
+COUNT(*) as liczba_osob,
+ROUND (AVG("Billing Amount"), 2) as kwota,
+CASE WHEN Age <= 18 THEN "0-18"
+    WHEN Age BETWEEN 19 AND 35 THEN "19-35"
+    WHEN Age BETWEEN 36 AND 50 THEN "36-50"
+    WHEN Age BETWEEN 51 AND 65 THEN "51-65"
+    WHEN Age > 65 THEN "65+"
+    END AS age_group
+FROM healthcare_dataset hd
+GROUP BY "Medical Condition", age_group
+ORDER BY kwota DESC;
+
+SELECT "Medical Condition", "Admission Type",
+RANK () OVER (ORDER BY ROUND (AVG("Billing Amount"), 2) DESC) as rank,
+COUNT(*) as liczba_osob,
+ROUND (AVG("Billing Amount"), 2) as kwota
+FROM healthcare_dataset hd
+GROUP BY "Medical Condition","Admission Type"
+ORDER BY kwota DESC;
