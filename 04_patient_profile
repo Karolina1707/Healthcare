@@ -1,0 +1,18 @@
+-- EN: Patient segmentation by admission type and diagnosis, including average billing amount.
+-- PL: Segmentacja pacjentów według trybu przyjęcia i diagnozy ze średnim kosztem leczenia.
+
+SELECT "Medical Condition", "Admission Type",
+RANK () OVER (ORDER BY ROUND (AVG("Billing Amount"), 2) DESC) as rank,
+COUNT(*) as liczba_osob,
+ROUND (AVG("Billing Amount"), 2) as kwota
+FROM healthcare_dataset hd
+GROUP BY "Medical Condition","Admission Type"
+ORDER BY liczba_osob DESC;
+
+SELECT 
+strftime('%Y', "Date of Admission") AS rok,
+COUNT(*) AS liczba_pacjentow,
+ROUND (AVG("Billing Amount"), 2) as kwota
+FROM healthcare_dataset hd 
+GROUP BY rok
+ORDER BY kwota DESC;
