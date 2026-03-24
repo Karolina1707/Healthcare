@@ -20,3 +20,15 @@ ROUND (AVG(JULIANDAY("Discharge Date") - JULIANDAY("Date of Admission")), 1) as 
 FROM healthcare_dataset hd
 GROUP BY "Medical Condition"
 ORDER BY pobyt DESC;
+
+SELECT
+ROUND (AVG(JULIANDAY("Discharge Date") - JULIANDAY("Date of Admission")), 1) as pobyt,
+CASE WHEN Age <= 18 THEN "0-18"
+    WHEN Age BETWEEN 19 AND 35 THEN "19-35"
+    WHEN Age BETWEEN 36 AND 50 THEN "36-50"
+    WHEN Age BETWEEN 51 AND 65 THEN "51-65"
+    WHEN Age > 65 THEN "65+"
+    END AS age_group
+FROM healthcare_dataset hd
+GROUP BY age_group
+ORDER BY age_group DESC; 
