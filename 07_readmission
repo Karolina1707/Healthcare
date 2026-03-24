@@ -1,0 +1,53 @@
+-- EN: Readmission analysis using LAG() window function and multi-level CTEs 
+-- to calculate days between visits per patient.
+-- PL: Analiza readmisji z użyciem funkcji okna LAG() i wielopoziomowych CTE 
+-- do obliczenia liczby dni między wizytami pacjenta.
+
+SELECT Name, 
+COUNT(*) as wizyty
+FROM healthcare_dataset
+GROUP BY Name
+HAVING COUNT(*) > 1
+ORDER BY wizyty DESC;
+
+
+WITH cte AS (
+    SELECT Name, "Date of Admission", 
+    LAG("Date of Admission") OVER (PARTITION BY Name ORDER BY "Date of Admission") as poprzednia_wizyta
+    FROM healthcare_dataset
+)
+SELECT * FROM cte
+WHERE poprzednia_wizyta IS NOT NULL;
+
+WITH cte AS (
+    SELECT Name, "Date of Admission",
+    LAG("Date of Admission") OVER (PARTITION BY LOWER(Name) ORDER BY "Date of Admission") as poprzednia_wizyta
+    FROM healthcare_dataset
+)
+SELECT *, 
+ROUND(JULIANDAY("Date of Admission") - JULIANDAY(poprzednia_wizyta), 1) as dni_miedzy_wizytami
+FROM cte
+WHERE poprzednia_wizyta IS NOT NULL;
+
+WITH cte AS (
+    SELECT Name, "Date of Admission",
+    LAG("Date of Admission") OVER (PARTITION BY LOWER(Name) ORDER BY "Date of Admission") as poprzednia_wizyta
+    FROM healthcare_dataset
+)
+SELECT *, 
+ROUND(JULIANDAY("Date of Admission") - JULIANDAY(poprzednia_wizyta), 1) as dni_miedzy_wizytami
+FROM cte
+WHERE ROUND(JULIANDAY("Date of Admission") - JULIANDAY(poprzednia_wizyta), 1) > 0 and poprzednia_wizyta IS NOT NULL;
+
+WITH cte1 AS (
+    SELECT Name, "Date of Admission",
+    LAG("Date of Admission") OVER (PARTITION BY LOWER(Name) ORDER BY "Date of Admission") as poprzednia_wizyta
+    FROM healthcare_dataset
+),
+cte2 AS (
+    SELECT * , ROUND(JULIANDAY("Date of Admission") - JULIANDAY(poprzednia_wizyta), 1) as dni_miedzy_wizytami
+    FROM cte1
+    WHERE ROUND(JULIANDAY("Date of Admission") - JULIANDAY(poprzednia_wizyta), 1)> 0 and poprzednia_wizyta IS NOT NULL
+)
+SELECT ROUND(AVG(dni_miedzy_wizytami), 1) as srednia_dni
+FROM cte2;
